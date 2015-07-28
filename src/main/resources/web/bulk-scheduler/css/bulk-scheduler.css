@@ -1,0 +1,68 @@
+/**
+ * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+ * FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+ */
+
+body {
+  color: #353833;
+  font-family: "OpenSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0;
+  background-color: #757575;
+}
+
+.sub-header {
+  border-top: 6px solid #68b749;
+  background-color: #555555;
+  padding: 10px 0 10px 0;
+}
+
+.sub-header .page-title {
+  color: white;
+  font-size: 1.3em;
+}
+
+.sub-header .sub-header-top {
+  padding-left: 15px;
+  margin-bottom: 8px;
+}
+
+div.view-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  min-width: 600px;
+  color: #555555;
+  background-color: #757575;
+  border: 10px solid #757575;
+  top: 2px;
+  font-size: 12px;
+}
+
+.view-container .view {
+  background-color: #ffffff;
+  left: 0;
+  right: 0;
+  overflow: auto;
+  position: absolute;
+  top: 51px;
+  bottom: 0;
+}
+
+.xldbs-narrow-column {
+  width: 75px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.xldbs-wide-column {
+  width: 400px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.xldbs-font-12px {
+  font-size: 12px;
+}
+

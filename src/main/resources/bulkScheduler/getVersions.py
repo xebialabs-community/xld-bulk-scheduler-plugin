@@ -1,11 +1,8 @@
-import datetime
-def writeLog(text):
-	logfile = open("/Users/droberts/temp/logfile-" + str(datetime.datetime.date(datetime.datetime.now())) + ".txt","a")
-	logfile.write(text + "\n")
-	logfile.close()
-
-writeLog("Executing bulkScheduler/getVersions.py at " + str(datetime.datetime.now()) + "\n")
-writeLog(request.query['app'])
+#
+# THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+# FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+#
 
 result = []
 vers = repositoryService.query(Type.valueOf("udm.DeploymentPackage"),request.query['app'],None,None,None,None,1,-1)
