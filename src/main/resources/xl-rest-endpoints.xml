@@ -1,0 +1,11 @@
+<endpoints xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.xebialabs.com/deployit/endpoints"
+           xsi:schemaLocation="http://www.xebialabs.com/deployit/endpoints endpoints.xsd">
+
+    <endpoint path="/bulk-scheduler/getApps" method="GET" script="bulkScheduler/getApplications.py" />
+    <endpoint path="/bulk-scheduler/getDepApps" method="GET" script="bulkScheduler/getDeployedApplications.py" />
+    <endpoint path="/bulk-scheduler/getEnvs" method="GET" script="bulkScheduler/getEnvironments.py" />
+    <endpoint path="/bulk-scheduler/getVers" method="GET" script="bulkScheduler/getVersions.py" />
+
+</endpoints>
+
