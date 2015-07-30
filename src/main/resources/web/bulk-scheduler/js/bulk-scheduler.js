@@ -18,6 +18,7 @@ function loadAppDropdown() {
 			$.each(data.entity, function(idx, val) {
 							appItems.push("<option>" + val + "</option>")
 			});
+			appItems.sort();
 			$("#apps").empty().append(appItems);
 		}
 	})
@@ -37,6 +38,7 @@ function loadDepAppDropdown() {
 			$.each(data.entity, function(idx, val) {
 							depappItems.push("<option>" + val + "</option>")
 			});
+			depappItems.sort();
 			$("#depapps").empty().append(depappItems);
 		}
 	})
@@ -56,6 +58,7 @@ function loadEnvDropdown() {
 			$.each(data.entity, function(idx, val) {
 							envItems.push("<option>" + val + "</option>")
 			});
+			envItems.sort();
 			$("#envs").empty().append(envItems);
 		}
 	})
@@ -65,9 +68,10 @@ function showSelectedInitial() {
 	$("#initialdeployments").append("<tr>"
 		+ "<td class='app'>" + $('#apps').find(':selected').val() + "</td>"
 		+ "<td class='select-version'><select id='versions'</td>"
-		+ "<td>" + $('#envs').find(':selected').val() + "</td>" 
-		+ "<td><input type='text' value='yyyy-mm-dd' maxlength='10' size='10'></td>" 
-		+ "<td><input type='text' value='HH:MM:SS' maxlength='10' size='10'></td></tr>")
+		+ "<td class='env'>" + $('#envs').find(':selected').val() + "</td>" 
+		+ "<td><input class='date' type='text' value='yyyy-mm-dd' maxlength='10' size='10'></td>" 
+		+ "<td><input class='time' type='text' value='HH:MM:SS' maxlength='10' size='10'></td>"
+		+ "<td class='task'></td></tr>");
 	var $row = $("#initialdeployments").children("tbody").children("tr").last();
 	$.ajax({
 		datatype: "json",
@@ -92,9 +96,10 @@ function showSelectedUpdate() {
 		+ "<td class='app'>" + $('#apps').find(':selected').val() + "</td>"
 		+ "<td><select id='vers'</td>"
 		// + "<td><input type='button' value='Get app version' class='get-version'></td>"
-		+ "<td>" + $('#depapps').find(':selected').val() + "</td>"
-		+ "<td><input type='text' value='yyyy-mm-dd' maxlength='10' size='10'></td>"
-		+ "<td><input type='text' value='HH:MM:SS' maxlength='10' size='10'></td></tr>");
+		+ "<td class='depapp'>" + $('#depapps').find(':selected').val() + "</td>"
+		+ "<td><input class='date' type='text' value='yyyy-mm-dd' maxlength='10' size='10'></td>"
+		+ "<td><input class='time' type='text' value='HH:MM:SS' maxlength='10' size='10'></td>"
+		+ "<td class='task'></td></tr>");
 	var $row = $("#updatedeployments").children("tbody").children("tr").last();
 	$.ajax({
 		datatype: "json",
@@ -114,11 +119,225 @@ function showSelectedUpdate() {
 	})
 }
 
+// REST API methods for deployments
+
+// Global error variable
+
+globalError = false;
+
 function scheduleAllDeployments() {
-	alert("All deployments have been scheduled");
+	if (!globalError) {
+		driverInitialDeployments();
+	}
+	if (!globalError) {
+		driverUpdateDeployments();
+	}
+	globalError = false;
+}
+
+function driverInitialDeployments() {
+	$("table#initialdeployments").children("tbody").children("tr").each(
+		function() {
+			environment = $(this).children("td.env").text();
+			version = $(this).children("td.app").text() + "/" + $(this).find(":selected").val();
+			deploymentSpec = prepareInitial(environment, version);
+			if (!globalError) {
+				deploymentSpec = prepareDeployeds(deploymentSpec);
+			}
+			if (!globalError) {
+				deploymentSpec = validateDeployment(deploymentSpec);
+			}
+			if (!globalError) {
+				taskId = deploy(deploymentSpec);
+			}
+			if (!globalError && taskId.length > 0) {
+				scheduleTask(taskId, $(this).find("input.date").val(), $(this).find("input.time").val());
+			}
+			if (!globalError) {
+				$(this).children("td.task").html(taskId);
+			}
+		});
+}
+
+function driverUpdateDeployments() {
+
+	$("table#updatedeployments").children("tbody").children("tr").each(
+		function() {
+			deployedApplication = $(this).children("td.depapp").text();
+			version = $(this).children("td.app").text() + "/" + $(this).find(":selected").val();
+			deploymentSpec = prepareUpdate(version, deployedApplication);
+			if (!globalError) {
+				deploymentSpec = prepareDeployeds(deploymentSpec);
+			}
+			if (!globalError) {
+				deploymentSpec = validateDeployment(deploymentSpec);
+			}
+			if (!globalError) {
+				taskId = deploy(deploymentSpec);
+			}
+			if (!globalError && taskId.length > 0) {
+				scheduleTask(taskId, $(this).find("input.date").val(), $(this).find("input.time").val());
+			}
+			if (!globalError) {
+				$(this).children("td.task").html(taskId);
+			}
+		});
 }
 
 function clearBulkScheduler() {
 	$("#initialdeployments").children("tbody").empty();
 	$("#updatedeployments").children("tbody").empty();
+	globalError = false;
 }
+
+function commonError(xhr, status, error) {
+	globalError = true;
+ 	alert("commonError(): " + xhr.responseText);
+}
+
+function prepareInitial(env, ver) {
+	// console.log("Starting prepareInitial()");
+	ds = null;
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		data: {
+			environment: env,
+			version: ver
+		},
+		dataType: "xml",
+		url: "/deployit/deployment/prepare/initial",
+		success: function(data) {
+			ds = data;
+		},
+		error: commonError
+	});
+	// console.log((new XMLSerializer()).serializeToString(ds));
+	// console.log("Exiting prepareInitial()");
+	return ds;
+}
+
+function prepareUpdate(ver, depApp) {
+	// console.log("Starting prepareUpdate()");
+	ds = null;
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		data: {
+			version: ver,
+			deployedApplication: depApp
+		},
+		dataType: "xml",
+		url: "/deployit/deployment/prepare/update",
+		success: function(data) {
+			ds = data;	
+		},
+		error: commonError
+	});
+	// console.log((new XMLSerializer()).serializeToString(ds));
+	// console.log("Exiting prepareUpdate()");
+	return ds;
+}
+
+function prepareDeployeds(ds) {
+	// console.log("Starting prepareDeployeds()");
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		data: ds,
+		dataType: "xml",
+		headers: {"Content-Type": "application/xml"},
+		method: "POST",
+		processData: false,
+		url: "/deployit/deployment/prepare/deployeds",
+		success: function(data) {
+			ds = data;	
+		},
+		error: commonError
+	});
+	// console.log((new XMLSerializer()).serializeToString(ds));
+	// console.log("Exiting prepareDeployeds()");
+	return ds;
+}
+
+function validateDeployment(ds) {
+	// console.log("Starting validateDeployment()");
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		data: ds,
+		dataType: "xml",
+		headers: {"Content-Type": "application/xml"},
+		method: "POST",
+		processData: false,
+		url: "/deployit/deployment/validate",
+		success: function(data) {
+			ds = data;	
+		},
+		error: commonError
+	});
+	// console.log((new XMLSerializer()).serializeToString(ds));
+	// console.log("Exiting validateDeployment()");
+	return ds;
+}
+
+function deploy(ds) {
+	// console.log("Starting deploy()");
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		data: ds,
+		dataType: "text",
+		headers: {"Content-Type": "application/xml"},
+		method: "POST",
+		processData: false,
+		url: "/deployit/deployment",
+		success: function(data) {
+			id = data;	
+		},
+		error: commonError
+	});
+	// console.log("Task id is " + id);
+	// console.log("Exiting deploy()");
+	return id;
+}
+
+function scheduleTask(id, date, time) {
+	// console.log("Startng scheduleTask() " + id);
+	datetime = date + "T" + time + ".000-0000";
+	$.ajax({
+		async: false,
+		beforeSend: function(xhr) {
+			var base64 = parent.getAuthToken();
+			xhr.setRequestHeader("Authorization", base64);
+		},
+		crossDomain: true,
+		headers: {"Content-Type": "application/xml"},
+		method: "POST",
+		url: "/deployit/task/" + id + "/schedule?time=" + datetime,
+		success: function(data) {},
+		error: commonError
+	});
+	// console.log("Exiting scheduleTask() " + taskId);
+}
+

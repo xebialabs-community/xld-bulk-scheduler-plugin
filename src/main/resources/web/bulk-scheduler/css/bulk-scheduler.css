@@ -1,3 +1,9 @@
+/**
+ * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+ * FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+ */
+
 body {
   color: #353833;
   font-family: "OpenSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -51,7 +57,7 @@ div.view-container {
 }
 
 .xldbs-wide-column {
-  width: 400px;
+  width: 375px;
   font-size: 12px;
   font-weight: bold;
 }
