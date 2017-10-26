@@ -4,15 +4,19 @@
  * FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
  */
 
+function authorize(xhr) {
+    if (parent && parent.getAuthToken) {
+        var base64 = parent.getAuthToken();
+        xhr.setRequestHeader("Authorization", base64);
+    }
+}
+
 function loadAppDropdown() {
 	$.ajax({
 		datatype: "json",
 		url: "/api/extension/bulk-scheduler/getApps",
 		crossDomain: true,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		success: function(data) {
 			var appItems = [];
 			$.each(data.entity, function(idx, val) {
@@ -29,10 +33,7 @@ function loadDepAppDropdown() {
 		datatype: "json",
 		url: "/api/extension/bulk-scheduler/getDepApps",
 		crossDomain: true,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		success: function(data) {
 			var depappItems = [];
 			$.each(data.entity, function(idx, val) {
@@ -49,10 +50,7 @@ function loadEnvDropdown() {
 		datatype: "json",
 		url: "/api/extension/bulk-scheduler/getEnvs",
 		crossDomain: true,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		success: function(data) {
 			var envItems = [];
 			$.each(data.entity, function(idx, val) {
@@ -77,10 +75,7 @@ function showSelectedInitial() {
 		datatype: "json",
 		url: "/api/extension/bulk-scheduler/getVers?app=" + $row.find(".app").text(),
 		crossDomain: true,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		success: function(data) {
 			var verItems = [];
 			$.each(data.entity, function(idx, val) {
@@ -105,10 +100,7 @@ function showSelectedUpdate() {
 		datatype: "json",
 		url: "/api/extension/bulk-scheduler/getVers?app=" + $row.find(".app").text(),
 		crossDomain: true,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		success: function(data) {
 			var verItems = [];
 			$.each(data.entity, function(idx, val) {
@@ -200,10 +192,7 @@ function prepareInitial(env, ver) {
 	ds = null;
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		data: {
 			environment: env,
@@ -226,10 +215,7 @@ function prepareUpdate(ver, depApp) {
 	ds = null;
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		data: {
 			version: ver,
@@ -251,10 +237,7 @@ function prepareDeployeds(ds) {
 	// console.log("Starting prepareDeployeds()");
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		data: ds,
 		dataType: "xml",
@@ -276,10 +259,7 @@ function validateDeployment(ds) {
 	// console.log("Starting validateDeployment()");
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		data: ds,
 		dataType: "xml",
@@ -301,10 +281,7 @@ function deploy(ds) {
 	// console.log("Starting deploy()");
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		data: ds,
 		dataType: "text",
@@ -327,10 +304,7 @@ function scheduleTask(id, date, time) {
 	datetime = date + "T" + time + ".000-0000";
 	$.ajax({
 		async: false,
-		beforeSend: function(xhr) {
-			var base64 = parent.getAuthToken();
-			xhr.setRequestHeader("Authorization", base64);
-		},
+		beforeSend: authorize,
 		crossDomain: true,
 		headers: {"Content-Type": "application/xml"},
 		method: "POST",
