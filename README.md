@@ -45,3 +45,5 @@ Continue adding initial and update deployments to the table, then press the Sche
 Errors will be indicated by JavaScript popups.  Processing will stop upon an error, leaving any as-yet unscheduled deployments to be resubmitted.
 
 Once the deployment tasks execute, they must be "closed" in order for them to appear within XL Deploy's reporting tab.  Open the task on the Task Monitor and press the Close button.
+
+![xld-bulk-scheduler-plugin](images/xld-bulk-scheduler-plugin.png)
